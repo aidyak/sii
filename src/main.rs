@@ -13,7 +13,7 @@ struct Cli {
 enum Commands {
     List,
     Add { path: String, branch: String },
-    Remove { path: String },
+    Remove { branch: String },
     New { branch: String },
 }
 
@@ -40,7 +40,11 @@ fn main() -> ExitCode {
     match cli.command {
         Commands::List => run_git(&["worktree", "list"]),
         Commands::Add { path, branch } => run_git(&["worktree", "add", &path, &branch]),
-        Commands::Remove { path } => run_git(&["worktree", "remove", &path]),
+        Commands::Remove { branch } => {
+            let dir_name = branch_to_dir_name(&branch);
+            let path = format!("worktrees/{}", dir_name);
+            run_git(&["worktree", "remove", &path])
+        }
         Commands::New { branch } => {
             let dir_name = branch_to_dir_name(&branch);
             let path = format!("worktrees/{}", dir_name);
